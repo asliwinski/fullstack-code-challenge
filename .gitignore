@@ -1,0 +1,6 @@
+.idea
+*/dist
+*/.env
+frontend/.env
+node_modules
+*/node_modules

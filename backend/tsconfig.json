@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@config": ["config"],
+      "@db": ["db"],
+      "@db/*": ["db/*"],
+      "@models/*": ["models/*"],
+      "@routes/*": ["routes/*"],
+      "@_types/*": ["_types/*"]
+    }
+  }
+}

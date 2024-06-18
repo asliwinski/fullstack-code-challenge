@@ -1,0 +1,8 @@
+packages:
+  - frontend
+  - backend
+#  - packages/api
+#  - packages/auth
+#  - packages/db
+#  - packages/config/*
+#  - packages/common
