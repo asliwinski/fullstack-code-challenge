@@ -1,14 +1,12 @@
-import { model, Schema, Document } from "mongoose";
-import { Question } from "@_types/question";
+import { InferSchemaType, model, Schema } from "mongoose";
 
-const QuestionSchema: Schema = new Schema({
+const QuestionSchema = new Schema({
   content: {
     type: String,
     required: true,
   },
 });
 
-export const QuestionModel = model<Question & Document>(
-  "Question",
-  QuestionSchema
-);
+export const QuestionModel = model("Question", QuestionSchema);
+
+export type Question = InferSchemaType<typeof QuestionSchema>;

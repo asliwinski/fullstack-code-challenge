@@ -1,20 +1,19 @@
-import { QuestionModel } from "@models/questions";
+import { Question, QuestionModel } from "../../models/questions";
 
-export function getQuestions() {
-  const cursor = QuestionModel.find({}).lean().cursor();
-  return cursor;
+export async function getQuestions() {
+  return QuestionModel.find({}).lean();
 }
 
-export function addQuestion(question) {
+export async function addQuestion(question: Question) {
   return QuestionModel.create(question);
 }
 
-export function editQuestion(question, id) {
+export async function editQuestion(question: Question, id: string) {
   return QuestionModel.findOneAndUpdate({ _id: id }, question, {
     new: true,
   });
 }
 
-export function deleteQuestion(id: string) {
+export async function deleteQuestion(id: string) {
   return QuestionModel.findOneAndDelete({ _id: id });
 }

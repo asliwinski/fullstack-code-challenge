@@ -23,7 +23,7 @@ export async function dbConnection() {
   }
   if (!cached.promise) {
     const dbConfig = {
-      url: MONGODB_URI,
+      url: MONGODB_URI!,
       options: {
         bufferCommands: false,
         connectTimeoutMS: 160_000,

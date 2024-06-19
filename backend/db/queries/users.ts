@@ -1,6 +1,5 @@
-import { UserModel } from "@models/users";
+import { UserModel } from "../../models/users";
 
-export function getUsers() {
-  const cursor = UserModel.find({}).lean().cursor();
-  return cursor;
+export async function getUsers() {
+  return UserModel.find({}).lean();
 }

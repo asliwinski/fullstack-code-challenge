@@ -1,7 +1,6 @@
-import { model, Schema, Document } from "mongoose";
-import { User } from "@_types/user";
+import { InferSchemaType, model, Schema } from "mongoose";
 
-const UserSchema: Schema = new Schema({
+const UserSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -14,4 +13,6 @@ const UserSchema: Schema = new Schema({
   },
 });
 
-export const UserModel = model<User & Document>("User", UserSchema);
+export const UserModel = model("User", UserSchema);
+
+export type User = InferSchemaType<typeof UserSchema>;

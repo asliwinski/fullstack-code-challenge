@@ -5,6 +5,7 @@
     "lib": ["es2017", "esnext.asynciterable"],
     "typeRoots": ["node_modules/@types"],
     "allowSyntheticDefaultImports": true,
+    "strict": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "forceConsistentCasingInFileNames": true,
@@ -20,6 +21,11 @@
     "resolveJsonModule": true,
     "importHelpers": true,
     "baseUrl": "./",
+    "paths": {
+      "@db": ["backed/db"],
+      "@db/*": ["backend/db/*"],
+      "@models/*": ["backend/models/*"],
+    }
   },
   "include": ["**/*.ts", "**/*.json",
     "backend/.env"

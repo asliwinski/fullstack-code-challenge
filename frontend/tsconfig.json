@@ -23,7 +23,8 @@
     "paths": {
       "@/*": ["./src/@/*"],
       "@queries/*": ["src/queries/*"],
-      "@models/*": ["models/*"]
+      "@models/*": ["models/*"],
+      "@db/*": ["../backend/db/*"]
     }
   },
   "include": [

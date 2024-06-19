@@ -1,26 +1,27 @@
-import { AnswerModel } from "@models/answers";
+import { Answer, AnswerModel } from "../../models/answers";
 
-export function getAnswersForUser(id: string) {
-  const cursor = AnswerModel.find({ user: id }).lean().cursor();
-  return cursor;
+export async function getAnswersForUser(id: string) {
+  return AnswerModel.find({ user: id }).lean();
 }
 
-export function addAnswer(answer) {
-  const { userId, questionId, content } = answer;
-  const newAnswer = {
-    user: userId,
-    question: questionId,
-    content,
-  };
-  return AnswerModel.create(newAnswer);
+export async function addAnswer(
+  answer: Omit<Answer, "user" | "question"> & { user: string; question: string }
+) {
+  return AnswerModel.create(answer);
 }
 
-export function editAnswer(answer, answerId) {
+export async function editAnswer(
+  answer: Omit<Answer, "user" | "question"> & {
+    user: string;
+    question: string;
+  },
+  answerId: string
+) {
   return AnswerModel.findOneAndUpdate({ _id: answerId }, answer, {
     new: true,
   });
 }
 
-export function deleteAnswer(answerId: string, userId: string) {
+export async function deleteAnswer(answerId: string, userId: string) {
   return AnswerModel.findOneAndDelete({ _id: answerId, user: userId });
 }

@@ -1,13 +1,5 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
-import {
-  upsertAnswer,
-  deleteAnswer,
-  getAnswersForUser,
-} from "@queries/answers";
 import { useParams } from "react-router-dom";
-import { getUsers } from "@queries/users";
-import { getQuestions } from "@queries/questions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,8 +10,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-
-type Question = any;
+import { trpc } from "./api/trpcClient";
+import { Answer, Question } from "./types";
 
 enum ModalType {
   UPSERT_ANSWER = "UPSERT_ANSWER",
@@ -27,26 +19,21 @@ enum ModalType {
 }
 
 export function User() {
-  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<
+    Question | null | undefined
+  >(null);
   const [modalOpen, setModalOpen] = useState<ModalType | null>(null);
 
   const { userId } = useParams();
-  const userAnswersQuery = useQuery({
-    queryKey: ["user", userId],
-    queryFn: () => getAnswersForUser(userId!),
-    enabled: !!userId,
-  });
-  const usersQuery = useQuery({ queryKey: ["users"], queryFn: getUsers });
-  const questionsQuery = useQuery({
-    queryKey: ["questions"],
-    queryFn: getQuestions,
-  });
+  const userAnswersQuery = trpc.getAnswersForUser.useQuery(userId!);
+  const usersQuery = trpc.getUsers.useQuery();
+  const questionsQuery = trpc.getQuestions.useQuery();
 
   function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
     setModalOpen(ModalType.UPSERT_ANSWER);
     setCurrentQuestion(
       questionsQuery.data?.find(
-        (q: Question) => q._id === event.currentTarget.dataset.question
+        (q) => q._id === event.currentTarget.dataset.question
       )
     );
   }
@@ -55,7 +42,7 @@ export function User() {
     setModalOpen(ModalType.DELETE_ANSWER);
     setCurrentQuestion(
       questionsQuery.data?.find(
-        (q: Question) => q._id === event.currentTarget.dataset.question
+        (q) => q._id === event.currentTarget.dataset.question
       )
     );
   }
@@ -66,6 +53,12 @@ export function User() {
   }
 
   function renderModal() {
+    if (!currentQuestion) return null;
+    const answer = userAnswersQuery.data?.find(
+      (a) => a.question === currentQuestion?._id
+    );
+    if (!answer) return null;
+
     switch (modalOpen) {
       case ModalType.UPSERT_ANSWER:
         return (
@@ -74,21 +67,17 @@ export function User() {
             question={currentQuestion}
             onClose={reset}
             onMutate={userAnswersQuery.refetch}
-            answer={userAnswersQuery.data.find(
-              (a: any) => a.question === currentQuestion._id
-            )}
+            answer={answer}
           />
         );
       case ModalType.DELETE_ANSWER:
         return (
-          <DeleteDialog
+          <DeleteAnswerDialog
             userId={userId || ""}
             question={currentQuestion}
             onClose={reset}
             onMutate={userAnswersQuery.refetch}
-            answer={userAnswersQuery.data.find(
-              (a: any) => a.question === currentQuestion._id
-            )}
+            answer={answer}
           />
         );
       default:
@@ -105,20 +94,18 @@ export function User() {
       {usersQuery.data && (
         <div className="flex space-x-2">
           <div className="font-bold">User:</div>
-          <div>
-            {usersQuery.data.find((user: any) => user._id === userId)?.name}
-          </div>
+          <div>{usersQuery.data.find((user) => user._id === userId)?.name}</div>
         </div>
       )}
       {userAnswersQuery.data && (
         <div>
-          {userAnswersQuery.data.map((answer: any) => (
+          {userAnswersQuery.data.map((answer) => (
             <div key={answer._id}>
               <div className="flex items-center gap-2 justify-between">
                 <div className="font-bold mt-4 mb-2">
                   {
                     questionsQuery.data?.find(
-                      (question: any) => question._id === answer.question
+                      (question) => question._id === answer.question
                     )?.content
                   }
                 </div>
@@ -153,12 +140,12 @@ export function User() {
           <ol className="divide-y divide-gray-200">
             {questionsQuery.data
               ?.filter(
-                (question: Question) =>
+                (question) =>
                   !userAnswersQuery.data
-                    ?.map((a: any) => a.question)
+                    ?.map((a) => a.question)
                     .includes(question._id)
               )
-              .map((question: any) => (
+              .map((question) => (
                 <li
                   className="flex p-4 gap-2 items-center justify-between"
                   key={question._id}
@@ -190,18 +177,7 @@ function AnswerDialog({
 }: DialogProps) {
   const [content, setContent] = useState(answer?.content || "");
 
-  const answerMutation = useMutation({
-    mutationFn: ({
-      userId,
-      content,
-      questionId,
-    }: {
-      userId: string;
-      content: string;
-      questionId: string;
-    }) => {
-      return upsertAnswer(userId, content, questionId, answer);
-    },
+  const answerMutation = trpc.upsertAnswer.useMutation({
     onSuccess: () => {
       onClose();
       onMutate();
@@ -230,6 +206,7 @@ function AnswerDialog({
                 userId,
                 content,
                 questionId: question._id,
+                answer,
               })
             }
           >
@@ -241,17 +218,14 @@ function AnswerDialog({
   );
 }
 
-function DeleteDialog({
+function DeleteAnswerDialog({
   userId,
   question,
   onClose,
   onMutate,
   answer,
 }: DialogProps) {
-  const answerDelete = useMutation({
-    mutationFn: ({ userId }: { userId: string }) => {
-      return deleteAnswer(userId, answer);
-    },
+  const answerDelete = trpc.deleteAnswer.useMutation({
     onSuccess: () => {
       onClose();
       onMutate();
@@ -271,7 +245,12 @@ function DeleteDialog({
         </DialogHeader>
         <div className="grid gap-4 py-4"></div>
         <DialogFooter>
-          <Button type="submit" onClick={() => answerDelete.mutate({ userId })}>
+          <Button
+            type="submit"
+            onClick={() =>
+              answerDelete.mutate({ answerId: answer._id, userId })
+            }
+          >
             Delete answer
           </Button>
         </DialogFooter>
@@ -282,8 +261,8 @@ function DeleteDialog({
 
 type DialogProps = {
   userId: string;
-  question: any;
+  question: Question;
   onClose: () => void;
   onMutate: () => void;
-  answer?: any;
+  answer: Answer;
 };

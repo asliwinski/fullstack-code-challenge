@@ -1,7 +1,6 @@
-import { model, Schema, Document } from "mongoose";
-import { Answer } from "@_types/answer";
+import { InferSchemaType, model, Schema } from "mongoose";
 
-const AnswerSchema: Schema = new Schema({
+const AnswerSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: "User",
@@ -19,4 +18,6 @@ const AnswerSchema: Schema = new Schema({
   },
 });
 
-export const AnswerModel = model<Answer & Document>("Answer", AnswerSchema);
+export const AnswerModel = model("Answer", AnswerSchema);
+
+export type Answer = InferSchemaType<typeof AnswerSchema>;

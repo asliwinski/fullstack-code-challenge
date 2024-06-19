@@ -1,10 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
-import {
-  getQuestions,
-  deleteQuestion,
-  upsertQuestion,
-} from "@queries/questions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,6 +9,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { trpc } from "./api/trpcClient";
+import { Question } from "./types";
 
 enum ModalType {
   UPSERT_QUESTION = "UPSERT_QUESTION",
@@ -22,26 +18,28 @@ enum ModalType {
 }
 
 export function Questions() {
-  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<
+    Question | null | undefined
+  >(null);
   const [modalOpen, setModalOpen] = useState<ModalType | null>(null);
-  const query = useQuery({ queryKey: ["questions"], queryFn: getQuestions });
+  const questionsQuery = trpc.getQuestions.useQuery();
 
   function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
-    setModalOpen(ModalType.UPSERT_QUESTION);
     setCurrentQuestion(
-      query.data?.find(
-        (q: Question) => q._id === event.currentTarget.dataset.question
+      questionsQuery.data?.find(
+        (q) => q._id === event.currentTarget.dataset.question
       )
     );
+    setModalOpen(ModalType.UPSERT_QUESTION);
   }
 
   function handleClickDelete(event: React.MouseEvent<HTMLButtonElement>) {
-    setModalOpen(ModalType.DELETE_QUESTION);
     setCurrentQuestion(
-      query.data?.find(
-        (q: Question) => q._id === event.currentTarget.dataset.question
+      questionsQuery.data?.find(
+        (q) => q._id === event.currentTarget.dataset.question
       )
     );
+    setModalOpen(ModalType.DELETE_QUESTION);
   }
 
   function reset() {
@@ -56,17 +54,17 @@ export function Questions() {
           <QuestionDialog
             question={currentQuestion}
             onClose={reset}
-            onMutate={query.refetch}
+            onMutate={questionsQuery.refetch}
           />
         );
       case ModalType.DELETE_QUESTION:
-        return (
+        return currentQuestion ? (
           <DeleteDialog
             question={currentQuestion}
             onClose={reset}
-            onMutate={query.refetch}
+            onMutate={questionsQuery.refetch}
           />
-        );
+        ) : null;
       default:
         return null;
     }
@@ -74,16 +72,15 @@ export function Questions() {
 
   return (
     <div className="flex flex-col gap-8 items-center">
-      {query.isLoading && <p>Loading...</p>}
-      {query.isError && <p>Error: {query.error.message}</p>}
-      {query.data && (
+      {questionsQuery.isLoading && <p>Loading...</p>}
+      {questionsQuery.isError && <p>Error: {questionsQuery.error.message}</p>}
+      {questionsQuery.data && (
         <ol className="divide-y divide-gray-200">
-          {query.data.map((question: any) => (
+          {questionsQuery.data.map((question) => (
             <li
               className="flex p-2 items-center gap-2 justify-between"
               key={question._id}
             >
-              {/*<div>{question.content}</div>*/}
               <div>{question.content}</div>
               <div className="flex items-center gap-1">
                 <Button
@@ -113,19 +110,16 @@ export function Questions() {
   );
 }
 
-type QuestionDialogProps = {
-  question?: any;
-  onClose: () => void;
-  onMutate: () => void;
-};
-
-function QuestionDialog({ question, onClose, onMutate }: QuestionDialogProps) {
+function QuestionDialog({
+  question,
+  onClose,
+  onMutate,
+}: Omit<DialogProps, "question"> & {
+  question?: Question | null;
+}) {
   const [content, setContent] = useState(question?.content || "");
 
-  const questionMutation = useMutation({
-    mutationFn: ({ content }: { content: string }) => {
-      return upsertQuestion(content, question);
-    },
+  const questionMutation = trpc.upsertQuestion.useMutation({
     onSuccess: () => {
       onClose();
       onMutate();
@@ -138,7 +132,6 @@ function QuestionDialog({ question, onClose, onMutate }: QuestionDialogProps) {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{`${question ? "Edit" : "Add"} question`}</DialogTitle>
-          {/*<DialogDescription>{question.content}</DialogDescription>*/}
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <Textarea
@@ -149,7 +142,7 @@ function QuestionDialog({ question, onClose, onMutate }: QuestionDialogProps) {
         <DialogFooter>
           <Button
             type="submit"
-            onClick={() => questionMutation.mutate({ content })}
+            onClick={() => questionMutation.mutate({ content, question })}
           >
             Save changes
           </Button>
@@ -160,10 +153,7 @@ function QuestionDialog({ question, onClose, onMutate }: QuestionDialogProps) {
 }
 
 function DeleteDialog({ question, onClose, onMutate }: DialogProps) {
-  const questionDelete = useMutation({
-    mutationFn: () => {
-      return deleteQuestion(question._id);
-    },
+  const questionDelete = trpc.deleteQuestion.useMutation({
     onSuccess: () => {
       onClose();
       onMutate();
@@ -183,7 +173,10 @@ function DeleteDialog({ question, onClose, onMutate }: DialogProps) {
         </DialogHeader>
         <div className="grid gap-4 py-4"></div>
         <DialogFooter>
-          <Button type="submit" onClick={() => questionDelete.mutate()}>
+          <Button
+            type="submit"
+            onClick={() => questionDelete.mutate(question._id)}
+          >
             Delete question
           </Button>
         </DialogFooter>
@@ -193,9 +186,7 @@ function DeleteDialog({ question, onClose, onMutate }: DialogProps) {
 }
 
 type DialogProps = {
-  question: any;
+  question: Question;
   onClose: () => void;
   onMutate: () => void;
 };
-
-type Question = any;

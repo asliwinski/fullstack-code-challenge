@@ -1,14 +1,15 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "strict": true,
     "baseUrl": "./",
     "paths": {
+      "@api/*": ["api/*"],
       "@config": ["config"],
       "@db": ["db"],
       "@db/*": ["db/*"],
       "@models/*": ["models/*"],
-      "@routes/*": ["routes/*"],
-      "@_types/*": ["_types/*"]
+      "@routes/*": ["routes/*"]
     }
   }
 }
