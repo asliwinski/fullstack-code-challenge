@@ -3,6 +3,8 @@ import { usersRouter } from "./users";
 import { questionsRouter } from "./questions";
 import { t } from "./common";
 
+export const { createCallerFactory } = t;
+
 export const appRouter = t.mergeRouters(
   questionsRouter,
   usersRouter,

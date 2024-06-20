@@ -16,10 +16,10 @@ export const questionsRouter = t.router({
         question: z.object({ _id: z.string() }).optional().nullable(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(({ input }) => {
       const { content, question } = input;
-      if (question) return await editQuestion({ content }, question._id);
-      await addQuestion({ content });
+      if (question) return editQuestion({ content }, question._id);
+      return addQuestion({ content });
     }),
   deleteQuestion: publicProcedure
     .input(z.string())

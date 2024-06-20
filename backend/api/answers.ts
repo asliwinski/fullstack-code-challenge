@@ -20,14 +20,14 @@ export const answersRouter = t.router({
         answer: z.object({ _id: z.string() }).optional().nullable(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(({ input }) => {
       const { userId, content, questionId, answer } = input;
       if (answer)
-        return await editAnswer(
+        return editAnswer(
           { user: userId, question: questionId, content },
           answer._id
         );
-      return await addAnswer({ user: userId, question: questionId, content });
+      return addAnswer({ user: userId, question: questionId, content });
     }),
   deleteAnswer: publicProcedure
     .input(z.object({ answerId: z.string(), userId: z.string() }))

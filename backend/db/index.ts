@@ -1,11 +1,13 @@
 import mongoose, { set } from "mongoose";
 import { NODE_ENV, MONGODB_URI } from "@config";
+import { MongoMemoryServer } from "mongodb-memory-server";
 
 declare global {
   var mongoose: any;
+  var mongoServer: any;
 }
 
-if (!MONGODB_URI) {
+if (!MONGODB_URI && NODE_ENV !== "test") {
   throw new Error(
     "Please define the MONGODB_URI environment variable inside .env"
   );
@@ -21,16 +23,24 @@ export async function dbConnection() {
   if (cached.conn) {
     return cached.conn;
   }
+
+  let testUri;
+
+  if (NODE_ENV === "test") {
+    global.mongoServer = await MongoMemoryServer.create();
+    testUri = mongoServer.getUri();
+  }
+
   if (!cached.promise) {
     const dbConfig = {
-      url: MONGODB_URI!,
+      url: NODE_ENV === "test" ? testUri : MONGODB_URI!,
       options: {
         bufferCommands: false,
         connectTimeoutMS: 160_000,
         serverSelectionTimeoutMS: 60_000,
       },
     };
-    if (NODE_ENV !== "production") {
+    if (NODE_ENV !== "production" && NODE_ENV !== "test") {
       set("debug", true);
     }
 

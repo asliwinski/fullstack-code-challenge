@@ -1,16 +1,16 @@
 import { Answer, AnswerModel } from "../../models/answers";
 
-export async function getAnswersForUser(id: string) {
+export function getAnswersForUser(id: string) {
   return AnswerModel.find({ user: id }).lean();
 }
 
-export async function addAnswer(
+export function addAnswer(
   answer: Omit<Answer, "user" | "question"> & { user: string; question: string }
 ) {
   return AnswerModel.create(answer);
 }
 
-export async function editAnswer(
+export function editAnswer(
   answer: Omit<Answer, "user" | "question"> & {
     user: string;
     question: string;
@@ -19,9 +19,9 @@ export async function editAnswer(
 ) {
   return AnswerModel.findOneAndUpdate({ _id: answerId }, answer, {
     new: true,
-  });
+  }).exec();
 }
 
-export async function deleteAnswer(answerId: string, userId: string) {
+export function deleteAnswer(answerId: string, userId: string) {
   return AnswerModel.findOneAndDelete({ _id: answerId, user: userId });
 }
