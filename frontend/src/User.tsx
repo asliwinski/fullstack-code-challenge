@@ -30,21 +30,21 @@ export function User() {
   const questionsQuery = trpc.getQuestions.useQuery();
 
   function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
-    setModalOpen(ModalType.UPSERT_ANSWER);
     setCurrentQuestion(
       questionsQuery.data?.find(
         (q) => q._id === event.currentTarget.dataset.question
       )
     );
+    setModalOpen(ModalType.UPSERT_ANSWER);
   }
 
   function handleClickDelete(event: React.MouseEvent<HTMLButtonElement>) {
-    setModalOpen(ModalType.DELETE_ANSWER);
     setCurrentQuestion(
       questionsQuery.data?.find(
         (q) => q._id === event.currentTarget.dataset.question
       )
     );
+    setModalOpen(ModalType.DELETE_ANSWER);
   }
 
   function reset() {
@@ -57,7 +57,6 @@ export function User() {
     const answer = userAnswersQuery.data?.find(
       (a) => a.question === currentQuestion?._id
     );
-    if (!answer) return null;
 
     switch (modalOpen) {
       case ModalType.UPSERT_ANSWER:
@@ -71,7 +70,7 @@ export function User() {
           />
         );
       case ModalType.DELETE_ANSWER:
-        return (
+        return answer ? (
           <DeleteAnswerDialog
             userId={userId || ""}
             question={currentQuestion}
@@ -79,7 +78,7 @@ export function User() {
             onMutate={userAnswersQuery.refetch}
             answer={answer}
           />
-        );
+        ) : null;
       default:
         return null;
     }
@@ -174,7 +173,7 @@ function AnswerDialog({
   onClose,
   onMutate,
   answer,
-}: DialogProps) {
+}: Omit<DialogProps, "answer"> & { answer?: Answer }) {
   const [content, setContent] = useState(answer?.content || "");
 
   const answerMutation = trpc.upsertAnswer.useMutation({
