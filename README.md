@@ -1,95 +1,157 @@
-Starting now.
-
 # Limbic Fullstack Code Challenge
 
-This is Limbic’s FullStack Challenge that combines bits from the frontend and backend challenges in one.
+This is Limbic's FullStack Challenge that combines bits from the frontend and backend challenges in one.
 
 Jane is a clinical therapist and wants her clients to answer simple questionnaires in order to better understand them. She needs a way to add/delete/edit questions and also see the answers of each client.
 
-## Backend 
+## Table of Contents
 
-You are tasked with writing an API to create/edit/delete Users, Questions, and Answers. It should be a NodeJS/ExpressJS server with the following endpoints:
+- [Setup Instructions](#setup-instructions)
+- [Scripts](#scripts)
+- [Project Structure](#project-structure)
+- [Technologies Used](#technologies-used)
 
-- Return all the users. (No need for other user endpoints, just create a sample set of users locally or in the db if you choose one)
-- Create a new Question
-- Edit a Question
-- Delete a Question
-- Create a user Answer
-- Edit a user Answer
-- Delete a user Answer
-- Return all the answers of a user
+## Setup Instructions
 
-**Stack Options:**
+### Prerequisites
 
-1. TypeScript, NodeJS, Apollo GraphQL, Jest / Mocha-Chai
-2. TypeScript, NodeJS, ExpressJS, Jest / Mocha-Chai
+- Node.js
+- pnpm (preferred package manager)
 
-🔎 **Things we're looking for:**
+### Installation
 
-It should be production quality as you understand it, i.e. tests, Docker, README, documentation, etc.
+1. Clone the repository:
+   ```sh
+   git clone <repository-url>
+   cd <repository-directory>
+   ```
 
-- TypeScript
-- Project Structure
-- Unit Tests
-- API Design
-- Error Handling
+2. Install dependencies:
+   ```sh
+   pnpm install
+   ```
 
-🏆 **BIG PLUS:**
+3. Set up environment variables:
+   - Create a `.env` file in the `backend` directory and add the following environment variables:
+     ```env
+     PORT=<your-backend-port>
+     MONGODB_URI=<your-mongodb-uri>
+     ```
+   - Create a `.env` file in the `frontend` directory and add the following environment variables:
+     ```env
+     PORT=<your-frontend-port>
+     REACT_APP_API_URL=<your-backend-api-url>
+     ```
 
-We don't care for data persistence at this point so you could just save everything in variables locally, but it's a big plus if you can also **save and read the data from a MongoDB or PostgreSQL database.**
+### Running the Application
 
-## Frontend
+1. Start the backend server:
+   ```sh
+   pnpm start-backend
+   ```
 
-You are tasked with writing a React/React Native app to consume the backend API. Your app should be able to complete the following tasks:
+2. Start the frontend application:
+   ```sh
+   pnpm start-client
+   ```
 
-- See a list of users
-- See a list of questions
-- add a new question
-- edit a question
-- delete a question
-- see all the answers of a user
-- add a new answer
-- delete an answer
+## Scripts
 
-🔎 **Things we're looking for:**
+- `pnpm start-backend`: Starts the backend server.
+- `pnpm start-frontend`: Starts the frontend application.
+- `pnpm start`: Starts both the backend and frontend concurrently.
+- `pnpm test-backend`: Runs tests for the backend.
+- `pnpm test-frontend`: Runs tests for the frontend.
+- `pnpm test`: Runs tests for both backend and frontend.
 
-- TypeScript
-- Project Structure
-- Components Structure
-- State Management
-- Separation of concerns
-- Data Handling
+## Project Structure
 
-🏆 **BIG PLUS:**
+### Backend
 
-You can use anything you want for state management. We use MobX and the Context API a lot so it's a big plus if you can also **implement some/all of the state handling with MobX and Context API**.
+```plaintext
+backend/
+├── api/
+│   ├── trpc.ts
+│   ├── questions.ts
+│   ├── users.ts
+│   ├── answers.ts
+│   ├── questions.test.ts
+│   ├── users.test.ts
+│   ├── answers.test.ts
+├── config/
+│   └── index.ts
+├── db/
+│   ├── index.ts
+│   ├── queries/
+│   │   ├── questions.ts
+│   │   ├── users.ts
+│   │   ├── answers.ts
+├── models/
+│   ├── questions.ts
+│   ├── users.ts
+│   ├── answers.ts
+├── server.ts
+├── jest.config.ts
+├── package.json
+└── tsconfig.json
+```
 
+### Frontend
 
-## Instructions
+```plaintext
+frontend/
+├── src/
+│   ├── @/
+│   │   ├── components/
+│   │   │   ├── App/
+│   |   │   │   ├── App.tsx
+│   │   │   │   ├── App.test.tsx
+│   │   │   ├── Home/
+│   │   │   │   ├── Home.tsx
+│   │   │   │   ├── Home.test.tsx
+│   │   │   ├── Questions/
+│   │   │   │   ├── Questions.tsx
+│   │   │   │   ├── Questions.test.tsx
+│   │   │   ├── User/
+│   │   │   │   ├── User.tsx
+│   │   │   │   ├── User.test.tsx
+│   │   │   ├── Users/
+│   │   │   │   ├── Users.tsx
+│   │   │   │   ├── Users.test.tsx
+│   │   │   ├── ui/
+│   │   │   │   ├── button.tsx
+│   │   │   │   ├── dialog.tsx
+│   │   │   │   ├── textarea.tsx
+│   ├── api/
+│   │   ├── trpcClient.ts
+│   ├── index.tsx
+│   ├── index.css
+│   ├── setupTests.ts
+│   ├── types.ts
+├── public/
+│   ├── index.html
+├── package.json
+├── tsconfig.json
+├── craco.config.ts
+├── tailwind.config.js
+└── components.json
+```
 
-1. **Submitting Code**
+## Technologies Used
 
-   **Option A:**
+- **Backend:**
+  - Node.js
+  - Express.js
+  - TypeScript
+  - tRPC
+  - Mongoose
+  - Jest
 
-   - Fork this repo
-   - Issue a Pull Request on the repo when you're ready to start. This will count as your starting date.
-   - For the frontend, setup your development environment for React or React Native in a **frontend** folder
-   - For the backend, setup your development environment for NodeJS with ExpressJS in a **backend** folder
-   - Implement your solution on each end
-   - Commit your changes into the forked repo
-
-   **Option B:**
-
-   - For the frontend, setup your development environment for React or React Native in a **frontend** folder
-   - For the backend, setup your development environment for NodeJS with ExpressJS in a **backend** folder
-   - Implement your solution for each end
-   - Archive the **frontend** and **backend** folders into a zip file
-   - Send us the zip file. We should be able to extract the content of each folder and run it from there (w/o node_modules)
-
-2. **Deadline:**
-
-   You have 1 week to complete as much tasks as you can from the challenge below. Countdown starts from date you issued the PR or from the date you were invited to complete this challenge via email
-
-3. **Implementation:**
-
-   There is no correct way to do the challenge, you are free to add whatever libraries you like besides the ones mentioned below. We want to see what you come up with on your own.
+- **Frontend:**
+  - React
+  - TypeScript
+  - React Query
+  - React Router
+  - Tailwind CSS
+  - shadcn
+  - CRACO
