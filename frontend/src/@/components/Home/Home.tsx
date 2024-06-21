@@ -1,5 +1,4 @@
-import { Users } from "./Users";
-import { Questions } from "./Questions";
+import { Questions, Users } from "@/components";
 
 export function Home() {
   return (

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,8 +10,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { trpc } from "./api/trpcClient";
-import { Question } from "./types";
+import { trpc } from "@api/trpcClient";
+import type { Question } from "@/types";
 
 enum ModalType {
   UPSERT_QUESTION = "UPSERT_QUESTION",
@@ -171,7 +172,6 @@ function DeleteDialog({ question, onClose, onMutate }: DialogProps) {
           </DialogDescription>
           <div className="font-bold text-sm">{question.content}</div>
         </DialogHeader>
-        <div className="grid gap-4 py-4"></div>
         <DialogFooter>
           <Button
             type="submit"

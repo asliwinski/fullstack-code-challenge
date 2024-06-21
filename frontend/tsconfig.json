@@ -22,12 +22,12 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/@/*"],
+      "@/components/*": ["./src/@/components/*"],
+      "@/types": ["src/types"],
       "@queries/*": ["src/queries/*"],
+      "@api/*": ["src/api/*"],
       "@models/*": ["models/*"],
       "@db/*": ["../backend/db/*"]
     }
   },
-  "include": [
-    "src"
-  ],
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { trpc } from "./api/trpcClient";
+import { trpc } from "@api/trpcClient";
 
 export function Users() {
   const usersQuery = trpc.getUsers.useQuery();

@@ -10,8 +10,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { trpc } from "./api/trpcClient";
-import { Answer, Question } from "./types";
+import { trpc } from "@api/trpcClient";
+import { Answer, Question } from "@/types";
 
 enum ModalType {
   UPSERT_ANSWER = "UPSERT_ANSWER",
@@ -85,7 +85,7 @@ export function User() {
   }
 
   return (
-    <div className="w-full max-w-xl mx-auto ">
+    <div className="w-full max-w-2xl mx-auto p-4">
       {userAnswersQuery.isLoading && <p>Loading...</p>}
       {userAnswersQuery.isError && (
         <p>Error: {userAnswersQuery.error.message}</p>
@@ -101,7 +101,7 @@ export function User() {
           {userAnswersQuery.data.map((answer) => (
             <div key={answer._id}>
               <div className="flex items-center gap-2 justify-between">
-                <div className="font-bold mt-4 mb-2">
+                <div className="font-bold mt-4 mb-2 text-justify">
                   {
                     questionsQuery.data?.find(
                       (question) => question._id === answer.question
@@ -125,7 +125,7 @@ export function User() {
                   </Button>
                 </div>
               </div>
-              <p>{answer.content}</p>
+              <p className="text-justify">{answer.content}</p>
             </div>
           ))}
         </div>
@@ -146,10 +146,10 @@ export function User() {
               )
               .map((question) => (
                 <li
-                  className="flex p-4 gap-2 items-center justify-between"
+                  className="flex py-4 gap-2 items-center justify-between"
                   key={question._id}
                 >
-                  <div>{question.content}</div>
+                  <div className="text-justify">{question.content}</div>
                   <Button
                     variant="outline"
                     data-question={question._id}
