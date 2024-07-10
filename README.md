@@ -1,6 +1,6 @@
-# Limbic Fullstack Code Challenge
+# Fullstack Code Challenge
 
-This is Limbic's FullStack Challenge that combines bits from the frontend and backend challenges in one.
+This is a Full Stack Challenge that combines bits from the frontend and backend challenges in one.
 
 Jane is a clinical therapist and wants her clients to answer simple questionnaires in order to better understand them. She needs a way to add/delete/edit questions and also see the answers of each client.
 
