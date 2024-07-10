@@ -1,7 +1,30 @@
 import { Answer, AnswerModel } from "../../models/answers";
+import mongoose from "mongoose";
+
+const { ObjectId } = mongoose.Types;
 
 export function getAnswersForUser(id: string) {
-  return AnswerModel.find({ user: id }).lean();
+  return AnswerModel.aggregate([
+    {
+      $match: { user: new ObjectId(id) },
+    },
+    {
+      $lookup: {
+        from: "questions",
+        localField: "question",
+        foreignField: "_id",
+        as: "questionDetails",
+      },
+    },
+    {
+      $match: { questionDetails: { $ne: [] } },
+    },
+    {
+      $project: {
+        questionDetails: 0,
+      },
+    },
+  ]).exec();
 }
 
 export function addAnswer(
